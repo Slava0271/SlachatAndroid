@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_small">6dp</dimen>
+    <dimen name="padding_view">15dp</dimen>
+    <dimen name="big_padding">150dp</dimen>
+    <dimen name="login_button_size">50dp</dimen>
+    <dimen name="big_button_padding">50dp</dimen>
+    <dimen name="padding_100">100dp</dimen>
+</resources>
