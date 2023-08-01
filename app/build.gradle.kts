@@ -50,7 +50,8 @@ android {
 }
 
 dependencies {
-
+    implementation("io.insert-koin:koin-androidx-compose:3.4.0")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")

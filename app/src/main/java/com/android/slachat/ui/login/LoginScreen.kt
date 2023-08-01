@@ -33,7 +33,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.android.slachat.R
+import com.android.slachat.presentation.SignInPresentation
 import com.android.slachat.ui.theme.EduSABeginnerFont
+import org.koin.androidx.compose.get
 
 val bodyMedium = TextStyle(
     fontFamily = EduSABeginnerFont,
@@ -44,6 +46,8 @@ val bodyMedium = TextStyle(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen() {
+    val signInPresentation = get<SignInPresentation>()
+
     val customTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = colorResource(id = R.color.silver),
         unfocusedBorderColor = colorResource(id = R.color.silver),
@@ -55,6 +59,9 @@ fun LoginScreen() {
         unfocusedLabelColor = colorResource(id = R.color.silver)
     )
 
+    var passwordField by remember { mutableStateOf(TextFieldValue("")) }
+    var loginField by remember { mutableStateOf(TextFieldValue("")) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,17 +71,50 @@ fun LoginScreen() {
             ),
         verticalArrangement = Arrangement.Center
     ) {
-        TitleText()
-        DescriptionText()
-        LoginField(customTextFieldColors)
-        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_view)))
-        PasswordField(customTextFieldColors)
-        LoginButton()
-        ForgotPassword {
-
-        }
+        LoginContent(
+            customTextFieldColors = customTextFieldColors,
+            loginField = loginField,
+            onLoginFieldChange = { newValue -> loginField = newValue },
+            passwordField = passwordField,
+            onPasswordFieldChange = { newValue -> passwordField = newValue },
+            onLoginButtonClick = {
+                if (signInPresentation.checkFields(loginField.text, passwordField.text))
+                    signInPresentation.signIn()
+            },
+            onForgotPasswordClick = { /* Handle Forgot Password click */ }
+        )
     }
 }
+
+@Composable
+fun LoginContent(
+    customTextFieldColors: TextFieldColors,
+    loginField: TextFieldValue,
+    onLoginFieldChange: (TextFieldValue) -> Unit,
+    passwordField: TextFieldValue,
+    onPasswordFieldChange: (TextFieldValue) -> Unit,
+    onLoginButtonClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit
+) {
+    TitleText()
+    DescriptionText()
+    LoginField(
+        customTextFieldColors = customTextFieldColors,
+        loginField = loginField,
+        onLoginFieldChange = onLoginFieldChange
+    )
+
+    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.padding_view)))
+    PasswordField(
+        customTextFieldColors = customTextFieldColors,
+        passwordField = passwordField,
+        onPasswordFieldChange = onPasswordFieldChange
+    )
+
+    LoginButton(callback = onLoginButtonClick)
+    ForgotPassword(onClick = onForgotPasswordClick)
+}
+
 
 @Composable
 fun TitleText() {
@@ -87,38 +127,38 @@ fun TitleText() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginField(customTextFieldColors: TextFieldColors) {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
-
+fun LoginField(
+    customTextFieldColors: TextFieldColors,
+    loginField: TextFieldValue,
+    onLoginFieldChange: (TextFieldValue) -> Unit
+) {
     OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth(),
-        value = text,
+        modifier = Modifier.fillMaxWidth(),
+        value = loginField,
         colors = customTextFieldColors,
-        onValueChange = {
-            text = it
+        onValueChange = { newValue ->
+            onLoginFieldChange(newValue)
         },
-        label = { Text(text = "Enter Your Name") }
+        label = { Text(text = stringResource(R.string.enter_your_name)) }
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordField(customTextFieldColors: TextFieldColors) {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
-
+fun PasswordField(
+    customTextFieldColors: TextFieldColors,
+    passwordField: TextFieldValue,
+    onPasswordFieldChange: (TextFieldValue) -> Unit
+) {
     OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth(),
-        value = text,
+        modifier = Modifier.fillMaxWidth(),
+        value = passwordField,
         colors = customTextFieldColors,
-        onValueChange = {
-            text = it
+        onValueChange = { newValue ->
+            onPasswordFieldChange(newValue)
         },
-        label = { Text(text = "Enter Your Name") }
+        label = { Text(text = stringResource(R.string.enter_password)) }
     )
-
 }
 
 
@@ -136,9 +176,9 @@ fun DescriptionText() {
 }
 
 @Composable
-fun LoginButton() {
+fun LoginButton(callback: () -> Unit) {
     Button(
-        onClick = { },
+        onClick = { callback.invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(
@@ -158,7 +198,7 @@ fun LoginButton() {
 @Composable
 fun ForgotPassword(onClick: () -> Unit) {
     Text(
-        text = "Forgot password ?",
+        text = stringResource(R.string.forgot_password),
         color = colorResource(id = R.color.black),
         modifier = Modifier
             .clickable {

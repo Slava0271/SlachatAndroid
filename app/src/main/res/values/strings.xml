@@ -3,4 +3,7 @@
     <string name="app_title">Slachat</string>
     <string name="app_description">Your best messenger experience ever</string>
     <string name="sign_in">Sign in</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="forgot_password">Forgot password ?</string>
 </resources>
