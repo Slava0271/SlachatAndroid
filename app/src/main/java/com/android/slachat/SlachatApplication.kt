@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.android.slachat.ui.chatlist.ChatScreen
 import com.android.slachat.ui.login.LoginScreen
 
 @Composable
@@ -12,7 +13,11 @@ fun OwlApp() {
     MaterialTheme {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "login") {
-            composable("login") { LoginScreen() }
+            composable("login") {
+                LoginScreen(navController = navController)
+            }
+            composable("chatItems") { ChatScreen() }
         }
     }
 }
+

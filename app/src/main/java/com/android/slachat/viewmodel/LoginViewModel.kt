@@ -1,7 +1,7 @@
 package com.android.slachat.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.android.slachat.data.SignInModel
 import com.android.slachat.presentation.SignInPresentation
 
@@ -10,11 +10,13 @@ class LoginViewModel : ViewModel(), SignInPresentation {
 
     }
 
-    override fun signIn() {
-        Log.d("showInfo", "That's match !")
+    override fun signIn(signInModel: SignInModel, navController: NavController) {
+        if (checkFields(signInModel)) {
+            navController.navigate("chatItems")
+        }
     }
 
-    override fun checkFields(signInModel: SignInModel) =
+    private fun checkFields(signInModel: SignInModel) =
         checkUserField(signInModel.login, signInModel.password)
 
     private fun checkUserField(login: String, password: String) =

@@ -1,7 +1,9 @@
 package com.android.slachat.ui.chatlist
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +41,24 @@ import org.koin.androidx.compose.get
 
 @Composable
 fun ChatScreen() {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        ItemsList()
 
+        Box(
+            modifier = Modifier
+                .padding(25.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            FloatingActionButton(
+                onClick = {
+                },
+                containerColor = colorResource(id = R.color.login_button)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }
+    }
 }
 
 @Composable
@@ -58,7 +81,7 @@ fun CircleImage(imageUrl: String) {
         Image(
             painter = rememberAsyncImagePainter(imageUrl),
             contentDescription = null,
-            contentScale = ContentScale.Crop, // Use Crop to fill the circular container without distortion
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -68,15 +91,19 @@ fun CircleImage(imageUrl: String) {
 fun ChatItem(model: ChatItemModel) {
     Box(
         modifier = Modifier
-            .fillMaxWidth() // Make the Box take up the full width of the parent
-            .padding(all = 8.dp)
+            .fillMaxWidth()
+            .clickable(onClick = { })
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(id = R.dimen.padding_small))
+        ) {
 
             CircleImage(imageUrl = model.imageUrl)
             Spacer(modifier = Modifier.width(15.dp))
 
-            Column(modifier = Modifier.weight(1f)) { // Added weight modifier to take up all available horizontal space
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small)),
                     text = model.username,
@@ -96,19 +123,19 @@ fun ChatItem(model: ChatItemModel) {
                 text = model.messageTime,
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
             )
         }
 
-        // Divider that starts from the end of the Image and spans the full width
         Divider(
             color = colorResource(id = R.color.silver),
             thickness = 1.dp,
             modifier = Modifier
-                .fillMaxWidth() // Make the Divider take up the full width of the parent
-                .padding(top = 20.dp) // Add padding as needed
-                .align(Alignment.BottomCenter) // Align the Divider at the bottom center of the Box
-                .offset(x = 85.dp) // Set the offset based on the width of the Image (60.dp + 15.dp)
+                .fillMaxWidth()
+                .padding(top = 20.dp)
+                .align(Alignment.BottomCenter)
+                .offset(x = 85.dp)
         )
     }
 }
@@ -117,7 +144,7 @@ fun ChatItem(model: ChatItemModel) {
 @Composable
 fun PreviewLoginScreen() {
     MaterialTheme {
-        ItemsList()
+        ChatScreen()
     }
 }
 

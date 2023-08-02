@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,9 +30,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.android.slachat.R
 import com.android.slachat.data.SignInModel
 import com.android.slachat.presentation.SignInPresentation
@@ -46,7 +51,7 @@ val bodyMedium = TextStyle(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     val signInPresentation = get<SignInPresentation>()
 
     val customTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
@@ -79,11 +84,10 @@ fun LoginScreen() {
             passwordField = passwordField,
             onPasswordFieldChange = { newValue -> passwordField = newValue },
             onLoginButtonClick = {
-                if (signInPresentation.checkFields(
-                        SignInModel(loginField.text, passwordField.text)
-                    )
+                signInPresentation.signIn(
+                    SignInModel(loginField.text, passwordField.text),
+                    navController
                 )
-                    signInPresentation.signIn()
             },
             onForgotPasswordClick = {
 
@@ -145,6 +149,7 @@ fun LoginField(
         onValueChange = { newValue ->
             onLoginFieldChange(newValue)
         },
+        singleLine = true,
         label = { Text(text = stringResource(R.string.enter_your_name)) }
     )
 }
@@ -163,7 +168,10 @@ fun PasswordField(
         onValueChange = { newValue ->
             onPasswordFieldChange(newValue)
         },
-        label = { Text(text = stringResource(R.string.enter_password)) }
+        singleLine = true,
+        label = { Text(text = stringResource(R.string.enter_password)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        visualTransformation = PasswordVisualTransformation(),
     )
 }
 
@@ -223,6 +231,7 @@ fun ForgotPassword(onClick: () -> Unit) {
 @Composable
 fun PreviewLoginScreen() {
     MaterialTheme {
-        LoginScreen()
+        val navController = rememberNavController()
+        LoginScreen(navController)
     }
 }
