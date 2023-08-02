@@ -2,6 +2,7 @@ package com.android.slachat.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.android.slachat.data.SignInModel
 import com.android.slachat.presentation.SignInPresentation
 
 class LoginViewModel : ViewModel(), SignInPresentation {
@@ -13,7 +14,8 @@ class LoginViewModel : ViewModel(), SignInPresentation {
         Log.d("showInfo", "That's match !")
     }
 
-    override fun checkFields(login: String, password: String) = checkUserField(login, password)
+    override fun checkFields(signInModel: SignInModel) =
+        checkUserField(signInModel.login, signInModel.password)
 
     private fun checkUserField(login: String, password: String) =
         isValidUsername(login) && isValidPassword(password)

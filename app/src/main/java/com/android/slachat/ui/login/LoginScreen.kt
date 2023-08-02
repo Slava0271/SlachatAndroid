@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.android.slachat.R
+import com.android.slachat.data.SignInModel
 import com.android.slachat.presentation.SignInPresentation
 import com.android.slachat.ui.theme.EduSABeginnerFont
 import org.koin.androidx.compose.get
@@ -78,10 +79,15 @@ fun LoginScreen() {
             passwordField = passwordField,
             onPasswordFieldChange = { newValue -> passwordField = newValue },
             onLoginButtonClick = {
-                if (signInPresentation.checkFields(loginField.text, passwordField.text))
+                if (signInPresentation.checkFields(
+                        SignInModel(loginField.text, passwordField.text)
+                    )
+                )
                     signInPresentation.signIn()
             },
-            onForgotPasswordClick = { /* Handle Forgot Password click */ }
+            onForgotPasswordClick = {
+
+            }
         )
     }
 }
