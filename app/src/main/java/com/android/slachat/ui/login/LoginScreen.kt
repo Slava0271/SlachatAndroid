@@ -196,7 +196,7 @@ fun LoginButton(callback: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = dimensionResource(id = R.dimen.big_button_padding)
+                top = dimensionResource(id = R.dimen.medium_padding)
             )
             .height(dimensionResource(id = R.dimen.login_button_size)), // Use IntrinsicSize.Min to ensure the button's height is not cut off
         shape = RoundedCornerShape(10),

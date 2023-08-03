@@ -33,16 +33,18 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.android.slachat.R
 import com.android.slachat.data.ChatItemModel
-import com.android.slachat.repository.ChatListRepository
+import com.android.slachat.viewmodel.ChatListViewModel
 import org.koin.androidx.compose.get
 
 @Composable
-fun ChatScreen() {
+fun ChatScreen(navController: NavController) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        ItemsList()
+        ItemsList(navController)
 
         Box(
             modifier = Modifier
@@ -62,11 +64,13 @@ fun ChatScreen() {
 }
 
 @Composable
-fun ItemsList() {
-    val chatListRepository = get<ChatListRepository>()
+fun ItemsList(navController: NavController) {
+    val viewModel = get<ChatListViewModel>()
     LazyColumn {
-        items(chatListRepository.getList()) {
-            ChatItem(model = it)
+        items(viewModel.getList()) {
+            ChatItem(model = it) {
+                viewModel.onItemClick(navController)
+            }
         }
     }
 }
@@ -88,11 +92,11 @@ fun CircleImage(imageUrl: String) {
 }
 
 @Composable
-fun ChatItem(model: ChatItemModel) {
+fun ChatItem(model: ChatItemModel, handleClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = { })
+            .clickable(onClick = { handleClick.invoke() })
     ) {
         Row(
             modifier = Modifier
@@ -144,7 +148,8 @@ fun ChatItem(model: ChatItemModel) {
 @Composable
 fun PreviewLoginScreen() {
     MaterialTheme {
-        ChatScreen()
+        val navController = rememberNavController()
+        ChatScreen(navController)
     }
 }
 
