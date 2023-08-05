@@ -1,13 +1,17 @@
 package com.android.slachat.ui.conversation
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.semantics
@@ -42,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.android.slachat.R
 import com.android.slachat.data.ConversationUserModel
+import com.android.slachat.data.MessageModel
 import com.android.slachat.ui.conversation.model.ConversationModel
 import com.android.slachat.viewmodel.ConversationViewModel
 import org.koin.androidx.compose.get
@@ -81,7 +88,7 @@ fun ConversationScreen(navController: NavController) {
 fun ConversationMessages(model: ConversationUserModel, items: List<ConversationModel>) {
     LazyColumn {
         items(items) {
-            Message(conversationUserModel = model, it)
+            MyMessage(conversationUserModel = model, it)
         }
     }
 }
@@ -126,17 +133,19 @@ fun MyMessage(conversationUserModel: ConversationUserModel, message: Conversatio
 }
 
 @Composable
-fun AuthorAndTextMessage(messageModel: ConversationModel,modifier: Modifier= Modifier) {
-    Column (modifier){
+fun AuthorAndTextMessage(messageModel: ConversationModel, modifier: Modifier = Modifier) {
+    Column(modifier) {
         AuthorNameTimestamp(messageModel = messageModel)
         Spacer(modifier = Modifier.height(4.dp))
-        ChatItemBubble(message = messageModel, isUserMe = messageModel.userName.isBlank())
+        ChatItemBubble(message = messageModel, isUserMe = true)
     }
 }
 
 @Composable
 private fun AuthorNameTimestamp(messageModel: ConversationModel) {
-    Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
+    Row(
+        modifier = Modifier
+            .semantics(mergeDescendants = true) {}) {
         Text(
             text = messageModel.userName,
             style = MaterialTheme.typography.titleMedium,
@@ -166,14 +175,19 @@ fun ChatItemBubble(
         MaterialTheme.colorScheme.surfaceVariant
     }
 
+    val shape = if (isUserMe) ChatBubbleShapeMe else ChatBubbleShapeAnotherUser
+    val modifier =
+        if (isUserMe) Modifier.padding(start = dimensionResource(id = R.dimen.padding_view))
+        else Modifier.padding(end = dimensionResource(id = R.dimen.padding_view))
+
     Column {
         Surface(
             color = backgroundBubbleColor,
-            shape = ChatBubbleShapeAnotherUser,
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_view))
+            shape = shape,
+            modifier = modifier
         ) {
             ClickableMessage(
-                message = message
+                message = message,
             )
         }
     }
@@ -183,14 +197,24 @@ fun ChatItemBubble(
 fun ClickableMessage(
     message: ConversationModel
 ) {
+    val width = getWidthDp(LocalContext.current)
     Text(
         text = message.message,
         style = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .widthIn(0.dp, width.dp),
     )
 }
 
+fun getWidthDp(context: Context): Float {
+    val displayMetrics = context.resources.displayMetrics
+    return (displayMetrics.widthPixels / displayMetrics.density) * 0.65f
+}
+
+
 private val ChatBubbleShapeAnotherUser = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+private val ChatBubbleShapeMe = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
 
 
 @Preview(showBackground = true)
@@ -198,7 +222,8 @@ private val ChatBubbleShapeAnotherUser = RoundedCornerShape(4.dp, 20.dp, 20.dp, 
 fun PreviewLoginScreen() {
     MaterialTheme {
         val navController = rememberNavController()
-        ConversationScreen(navController = navController)
+         ConversationScreen(navController = navController)
+       // AuthorNameTimestamp(ConversationModel("sddsds", "sdsdds", "sddsds"))
     }
 }
 
