@@ -7,112 +7,94 @@ class MockChatList {
         fun getData() = MockChatList().defaultList
     }
 
+    private val userNames = listOf("Nikolay", "Slavuha", "Voldemar", "Ryan Gosling")
+
+
     private val defaultList = listOf(
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
         ChatItemModel(
             imagesList().random(),
-            "Kotik",
+            userNames.random(),
             "" +
                     "Myau-myau",
             "10:20"
         ),
-        ChatItemModel(
-            imagesList().random(),
-            "Kotik",
-            "" +
-                    "Myau-myau",
-            "10:20"
-        ),
-        ChatItemModel(
-            imagesList().random(),
-            "Kotik",
-            "" +
-                    "Myau-myau",
-            "10:20"
-        ),
-        ChatItemModel(
-            imagesList().random(),
-            "Kotik",
-            "" +
-                    "Myau-myau",
-            "10:20"
-        )
     )
 
     private fun imagesList() = listOf(
