@@ -6,4 +6,11 @@
     <string name="enter_password">Enter Password</string>
     <string name="enter_your_name">Enter Your Name</string>
     <string name="forgot_password">Forgot password ?</string>
+    <string name="send">Send</string>
+    <string name="emoji_selector_bt_desc">Show Emoji selector\n</string>
+    <string name="dm_desc">Direct message</string>
+    <string name="attach_photo_desc">Atach photo</string>
+    <string name="map_selector_desc">Location send</string>
+    <string name="videochat_desc">Videochat</string>
+    <string name="textfield_desc">Text input</string>
 </resources>

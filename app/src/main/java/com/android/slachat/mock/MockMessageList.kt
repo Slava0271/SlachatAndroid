@@ -12,6 +12,7 @@ class MockMessageList {
         "Can you provide what are you talking about",
         "Sure, i'll call you a bit latter",
         "See you soon!",
+        "How you noting today ? ",
         "I've hear that you bought a new car, that's true ?"
     )
     private val userNames = listOf("Nikolay", "Slavuha", "Voldemar", "Ryan Gosling")

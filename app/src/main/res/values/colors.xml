@@ -9,5 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="silver">#C0C0C0</color>
     <color name="light_silver">#F6F6F6</color>
-    <color name="login_button">#FF6CDBAC</color>
+    <color name="login_button">#6CDBAC</color>
+    <color name="my_message_color">#CAEFE0</color>
 </resources>

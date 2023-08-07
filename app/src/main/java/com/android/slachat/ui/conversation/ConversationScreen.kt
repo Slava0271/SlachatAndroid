@@ -4,17 +4,18 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
@@ -48,7 +49,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.android.slachat.R
 import com.android.slachat.data.ConversationUserModel
-import com.android.slachat.data.MessageModel
 import com.android.slachat.ui.conversation.model.ConversationModel
 import com.android.slachat.viewmodel.ConversationViewModel
 import org.koin.androidx.compose.get
@@ -77,18 +77,37 @@ fun ConversationScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ConversationMessages(model = viewModel.model, viewModel.getParsedData())
-            //MyMessage(viewModel.model, viewModel.getParsedData().first())
+            ConversationMessages(
+                model = viewModel.model,
+                items = viewModel.getParsedData(),
+                modifier = Modifier.weight(1f)
+            )
+            UserInput(
+                onMessageSent = { content ->
+
+                },
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding()
+            )
         }
 
     }
 }
 
 @Composable
-fun ConversationMessages(model: ConversationUserModel, items: List<ConversationModel>) {
-    LazyColumn {
-        items(items) {
-            MyMessage(conversationUserModel = model, it)
+fun ConversationMessages(
+    model: ConversationUserModel,
+    items: List<ConversationModel>,
+    modifier: Modifier
+) {
+    Box(modifier = modifier) {
+
+        LazyColumn {
+            items(items) { it ->
+                if (it.message.length % 2 != 0) MyMessage(conversationUserModel = model, it)
+                else Message(conversationUserModel = model, message = it)
+            }
         }
     }
 }
@@ -108,7 +127,7 @@ fun Message(conversationUserModel: ConversationUserModel, message: ConversationM
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
-        AuthorAndTextMessage(messageModel = message)
+        AuthorAndTextMessage(messageModel = message, isUserMe = false)
     }
 }
 
@@ -116,7 +135,7 @@ fun Message(conversationUserModel: ConversationUserModel, message: ConversationM
 fun MyMessage(conversationUserModel: ConversationUserModel, message: ConversationModel) {
     Row(modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_view))) {
         Spacer(modifier = Modifier.weight(1f))
-        AuthorAndTextMessage(messageModel = message.copy(userName = ""))
+        AuthorAndTextMessage(messageModel = message, isUserMe = true)
         Image(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -133,13 +152,18 @@ fun MyMessage(conversationUserModel: ConversationUserModel, message: Conversatio
 }
 
 @Composable
-fun AuthorAndTextMessage(messageModel: ConversationModel, modifier: Modifier = Modifier) {
+fun AuthorAndTextMessage(
+    messageModel: ConversationModel,
+    modifier: Modifier = Modifier,
+    isUserMe: Boolean
+) {
     Column(modifier) {
-        AuthorNameTimestamp(messageModel = messageModel)
+        if (!isUserMe) AuthorNameTimestamp(messageModel = messageModel)
         Spacer(modifier = Modifier.height(4.dp))
-        ChatItemBubble(message = messageModel, isUserMe = true)
+        ChatItemBubble(message = messageModel, isUserMe = isUserMe)
     }
 }
+
 
 @Composable
 private fun AuthorNameTimestamp(messageModel: ConversationModel) {
@@ -168,9 +192,9 @@ fun ChatItemBubble(
     message: ConversationModel,
     isUserMe: Boolean
 ) {
-
+    Log.d("showInfo", "$isUserMe")
     val backgroundBubbleColor = if (isUserMe) {
-        MaterialTheme.colorScheme.primary
+        colorResource(id = R.color.my_message_color)
     } else {
         MaterialTheme.colorScheme.surfaceVariant
     }
@@ -222,8 +246,7 @@ private val ChatBubbleShapeMe = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
 fun PreviewLoginScreen() {
     MaterialTheme {
         val navController = rememberNavController()
-         ConversationScreen(navController = navController)
-       // AuthorNameTimestamp(ConversationModel("sddsds", "sdsdds", "sddsds"))
+        ConversationScreen(navController = navController)
     }
 }
 
