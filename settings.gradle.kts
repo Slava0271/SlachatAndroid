@@ -15,4 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Slachat"
 include(":app")
+include(":network")
  
