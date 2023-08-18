@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.android.slachat.data.SignInModel
 import com.android.slachat.presentation.SignInPresentation
+import org.koin.core.component.KoinComponent
 
-class LoginViewModel : ViewModel(), SignInPresentation {
+class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent {
+
     override fun forgotPassword() {
 
     }

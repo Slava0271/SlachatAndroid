@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.code.gson:gson:2.10.1")
     implementation("io.insert-koin:koin-androidx-compose:3.4.0")
     implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.core:core-ktx:1.9.0")
@@ -69,4 +70,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
 }

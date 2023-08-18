@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +35,8 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +55,7 @@ import com.android.slachat.R
 import com.android.slachat.data.ConversationUserModel
 import com.android.slachat.ui.conversation.model.ConversationModel
 import com.android.slachat.viewmodel.ConversationViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 
 
@@ -58,7 +63,12 @@ import org.koin.androidx.compose.get
 @Composable
 fun ConversationScreen(navController: NavController) {
     val viewModel = get<ConversationViewModel>()
-    viewModel.getParsedData()
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    val _messages: MutableList<ConversationModel> = viewModel.getParsedData().toMutableStateList()
+    val messages: List<ConversationModel> = _messages
+
 
     Scaffold(
         topBar = {
@@ -79,12 +89,18 @@ fun ConversationScreen(navController: NavController) {
         ) {
             ConversationMessages(
                 model = viewModel.model,
-                items = viewModel.getParsedData(),
-                modifier = Modifier.weight(1f)
+                items = messages,
+                modifier = Modifier.weight(1f),
+                scrollState = scrollState
             )
             UserInput(
+                resetScroll = {
+                    scope.launch {
+                        scrollState.scrollToItem(messages.lastIndex)
+                    }
+                },
                 onMessageSent = { content ->
-
+                    _messages.add(ConversationModel(" ", "228", content))
                 },
                 modifier = Modifier
                     .navigationBarsPadding()
@@ -99,11 +115,14 @@ fun ConversationScreen(navController: NavController) {
 fun ConversationMessages(
     model: ConversationUserModel,
     items: List<ConversationModel>,
-    modifier: Modifier
+    modifier: Modifier,
+    scrollState: LazyListState
 ) {
     Box(modifier = modifier) {
 
-        LazyColumn {
+        LazyColumn(
+            state = scrollState
+        ) {
             items(items) { it ->
                 if (it.message.length % 2 != 0) MyMessage(conversationUserModel = model, it)
                 else Message(conversationUserModel = model, message = it)
@@ -192,7 +211,6 @@ fun ChatItemBubble(
     message: ConversationModel,
     isUserMe: Boolean
 ) {
-    Log.d("showInfo", "$isUserMe")
     val backgroundBubbleColor = if (isUserMe) {
         colorResource(id = R.color.my_message_color)
     } else {
