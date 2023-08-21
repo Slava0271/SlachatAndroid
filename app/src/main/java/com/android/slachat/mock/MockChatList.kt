@@ -5,6 +5,8 @@ import com.android.slachat.data.ChatItemModel
 class MockChatList {
     companion object {
         fun getData() = MockChatList().defaultList
+
+        fun getRandomImage() = MockChatList().imagesList().random()
     }
 
     private val userNames = listOf("Nikolay", "Slavuha", "Voldemar", "Ryan Gosling")

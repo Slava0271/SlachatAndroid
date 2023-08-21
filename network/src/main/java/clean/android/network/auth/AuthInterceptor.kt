@@ -21,7 +21,7 @@ class AuthInterceptor : Interceptor, KoinComponent {
         decorateRequest.addHeader("Accept", "application/json")
 
         if (apiTokenProvider.hasToken()) {
-            decorateRequest.addHeader("X-Auth-Token", apiTokenProvider.getToken())
+            decorateRequest.addHeader("Authorization", "Bearer ${apiTokenProvider.getToken()}")
         }
 
         val response = chain.proceed(decorateRequest.build())

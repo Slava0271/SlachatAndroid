@@ -198,7 +198,7 @@ fun LoginButton(callback: () -> Unit) {
             .padding(
                 top = dimensionResource(id = R.dimen.medium_padding)
             )
-            .height(dimensionResource(id = R.dimen.login_button_size)), // Use IntrinsicSize.Min to ensure the button's height is not cut off
+            .height(dimensionResource(id = R.dimen.login_button_size)),
         shape = RoundedCornerShape(10),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.login_button))
     ) {

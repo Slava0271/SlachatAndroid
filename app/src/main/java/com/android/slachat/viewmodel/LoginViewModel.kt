@@ -1,41 +1,46 @@
 package com.android.slachat.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import clean.android.network.either.onFailure
-import clean.android.network.either.onSuccess
+import clean.android.network.auth.ApiTokenProvider
+import clean.android.network.repository.ResponseErrorsRepository
 import com.android.slachat.data.SignInModel
+import com.android.slachat.either.onFailure
+import com.android.slachat.either.onSuccess
+import com.android.slachat.mapper.Mapper
 import com.android.slachat.network.model.LoginEntity
-import com.android.slachat.network.service.NetworkService
 import com.android.slachat.presentation.SignInPresentation
+import com.android.slachat.usecase.LoginUseCase
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent {
-    private val networkService: NetworkService by inject()
+class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent,
+    Mapper<SignInModel, LoginEntity> {
+    private val loginUseCase: LoginUseCase by inject()
+    private val tokenProvider: ApiTokenProvider by inject()
+    private val responseErrorsRepository: ResponseErrorsRepository by inject()
 
-    init {
-        viewModelScope.launch {
-            val result = networkService.login(LoginEntity("Slava200271", "Horosh_200271"))
-            result.onSuccess {
-                Log.d("showInfo", "$it")
-            }
-            result.onFailure {
-                Log.d("showInfo", "$it")
-            }
-        }
-    }
 
     override fun forgotPassword() {
 
     }
 
     override fun signIn(signInModel: SignInModel, navController: NavController) {
-        if (checkFields(signInModel)) {
-            navController.navigate("chatItems")
+        if (checkFields(signInModel)) loginRequest(signInModel, navController)
+    }
+
+    private fun loginRequest(signInModel: SignInModel, navController: NavController) {
+        viewModelScope.launch {
+            val result = loginUseCase.run(mapModel(signInModel))
+            result.onSuccess {
+                tokenProvider.saveToken(it.token, String())
+                navController.navigate("chatItems")
+            }
+            result.onFailure {
+                responseErrorsRepository.extractError(it)
+            }
         }
     }
 
@@ -68,5 +73,5 @@ class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent {
                 hasSpecialChar.containsMatchIn(password)
     }
 
-
+    override fun mapModel(model: SignInModel) = LoginEntity(model.login, model.password)
 }
