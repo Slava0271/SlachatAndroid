@@ -65,8 +65,8 @@ fun LoginScreen(navController: NavController) {
         unfocusedLabelColor = colorResource(id = R.color.silver)
     )
 
-    var passwordField by remember { mutableStateOf(TextFieldValue("")) }
-    var loginField by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordField by remember { mutableStateOf(TextFieldValue("Horosh_200271")) }
+    var loginField by remember { mutableStateOf(TextFieldValue("Slavuha")) }
 
     Column(
         modifier = Modifier
@@ -158,7 +158,7 @@ fun LoginField(
 @Composable
 fun PasswordField(
     customTextFieldColors: TextFieldColors,
-    passwordField: TextFieldValue,
+    passwordField: TextFieldValue =TextFieldValue("Horosh_200271"),
     onPasswordFieldChange: (TextFieldValue) -> Unit
 ) {
     OutlinedTextField(

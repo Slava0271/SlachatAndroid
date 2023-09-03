@@ -1,13 +1,14 @@
 package com.android.slachat.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import clean.android.network.auth.ApiTokenProvider
+import clean.android.network.either.onFailure
+import clean.android.network.either.onSuccess
 import clean.android.network.repository.ResponseErrorsRepository
 import com.android.slachat.data.SignInModel
-import com.android.slachat.either.onFailure
-import com.android.slachat.either.onSuccess
 import com.android.slachat.mapper.Mapper
 import com.android.slachat.network.model.LoginEntity
 import com.android.slachat.presentation.SignInPresentation
@@ -39,6 +40,7 @@ class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent,
                 navController.navigate("chatItems")
             }
             result.onFailure {
+                Log.d("showInfo","$it")
                 responseErrorsRepository.extractError(it)
             }
         }

@@ -1,5 +1,7 @@
 package com.android.slachat.ui.chatlist
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,13 +42,21 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.android.slachat.R
 import com.android.slachat.data.ChatItemModel
+import com.android.slachat.mock.MockChatList
 import com.android.slachat.viewmodel.ChatListViewModel
 import org.koin.androidx.compose.get
 
 @Composable
 fun ChatScreen(navController: NavController) {
+    val viewModel = get<ChatListViewModel>()
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            viewModel.uploadPhoto(it)
+        }
+    }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        ItemsList(navController)
+        ItemsList(navController, viewModel)
 
         Box(
             modifier = Modifier
@@ -56,6 +66,7 @@ fun ChatScreen(navController: NavController) {
         ) {
             FloatingActionButton(
                 onClick = {
+                    launcher.launch("image/*")
                 },
                 containerColor = colorResource(id = R.color.login_button)
             ) {
@@ -66,28 +77,41 @@ fun ChatScreen(navController: NavController) {
 }
 
 @Composable
-fun ItemsList(navController: NavController) {
-    val viewModel = get<ChatListViewModel>()
+fun ItemsList(navController: NavController, viewModel: ChatListViewModel) {
     val chatList by viewModel.getList().collectAsState(initial = emptyList())
-
-    LazyColumn {
-        items(chatList) { chatItemModel ->
-            ChatItem(model = chatItemModel) {
-                viewModel.onItemClick(navController)
+    if (chatList.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(chatList) { chatItemModel ->
+                ChatItem(model = chatItemModel) { userId ->
+                    viewModel.onItemClick(navController,userId)
+                }
             }
+        }
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "You haven't chats yet",
+                color = colorResource(id = R.color.silver),
+            )
         }
     }
 }
 
+
 @Composable
-fun CircleImage(imageUrl: String) {
+fun CircleImage(image: String) {
     Box(
         modifier = Modifier
             .size(60.dp)
             .clip(CircleShape)
     ) {
         Image(
-            painter = rememberAsyncImagePainter(imageUrl),
+            painter = rememberAsyncImagePainter(image),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -96,11 +120,11 @@ fun CircleImage(imageUrl: String) {
 }
 
 @Composable
-fun ChatItem(model: ChatItemModel, handleClick: () -> Unit) {
+fun ChatItem(model: ChatItemModel, handleClick: (userId : Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = { handleClick.invoke() })
+            .clickable(onClick = { handleClick.invoke(model.userId) })
     ) {
         Row(
             modifier = Modifier
@@ -108,7 +132,7 @@ fun ChatItem(model: ChatItemModel, handleClick: () -> Unit) {
                 .padding(dimensionResource(id = R.dimen.padding_small))
         ) {
 
-            CircleImage(imageUrl = model.imageUrl)
+            CircleImage(MockChatList.getRandomImage())
             Spacer(modifier = Modifier.width(15.dp))
 
             Column(modifier = Modifier.weight(1f)) {

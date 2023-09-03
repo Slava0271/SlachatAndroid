@@ -15,4 +15,10 @@ class ApiAnswerService(private val errorParser: ApiErrorParser) {
         if (!response.isSuccessful) return Either.failure(errorParser.parseError(response))
         return Either.success(Unit)
     }
+
+    fun <T, E> extractBytes(response: Response<E>): Either<T> {
+        if (!response.isSuccessful)
+            return Either.failure(errorParser.parseError(response))
+        return Either.success(response.raw().body.bytes() as T)
+    }
 }

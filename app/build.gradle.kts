@@ -72,6 +72,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.google.code.gson:gson:2.10.1")
+    implementation ("io.netty:netty-all:4.1.68.Final")
+
 
     implementation(project(":network"))
 

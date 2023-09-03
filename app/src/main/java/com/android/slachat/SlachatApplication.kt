@@ -10,7 +10,7 @@ import com.android.slachat.ui.conversation.ConversationScreen
 import com.android.slachat.ui.login.LoginScreen
 
 @Composable
-fun OwlApp() {
+fun SlachatApp() {
     MaterialTheme {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "login") {
@@ -18,8 +18,10 @@ fun OwlApp() {
                 LoginScreen(navController = navController)
             }
             composable("chatItems") { ChatScreen(navController) }
-            composable("conversation") { ConversationScreen(navController) }
-
+            composable("conversation/{userId}") { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")
+                ConversationScreen(navController, userId)
+            }
         }
     }
 }

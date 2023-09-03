@@ -1,7 +1,6 @@
 package com.android.slachat.ui.conversation
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -35,8 +34,11 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,19 +57,41 @@ import com.android.slachat.R
 import com.android.slachat.data.ConversationUserModel
 import com.android.slachat.ui.conversation.model.ConversationModel
 import com.android.slachat.viewmodel.ConversationViewModel
+import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationScreen(navController: NavController) {
+fun ConversationScreen(navController: NavController, userId: String?) {
     val viewModel = get<ConversationViewModel>()
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
 
-    val _messages: MutableList<ConversationModel> = viewModel.getParsedData().toMutableStateList()
-    val messages: List<ConversationModel> = _messages
+    val messages = remember { mutableStateListOf<ConversationModel>() }.also { list ->
+        list.addAll(viewModel.getParsedData())
+    }
+
+    val disposableHandle = remember { mutableStateOf<DisposableHandle?>(null) }
+
+    DisposableEffect(Unit) {
+        val handle = scope.launch {
+            viewModel.newMessageEvent.collect { newMessage ->
+                val updatedMessage = ConversationModel(
+                    newMessage,
+                    viewModel.getCurrentTime(),
+                    newMessage
+                )
+                messages.add(updatedMessage)
+            }
+        }
+        disposableHandle.value = handle.invokeOnCompletion { }
+
+        onDispose {
+            handle.cancel()
+        }
+    }
 
 
     Scaffold(
@@ -100,7 +124,7 @@ fun ConversationScreen(navController: NavController) {
                     }
                 },
                 onMessageSent = { content ->
-                    _messages.add(ConversationModel(" ", "228", content))
+                    messages.add(ConversationModel(" ", "228", content))
                 },
                 modifier = Modifier
                     .navigationBarsPadding()
@@ -116,15 +140,14 @@ fun ConversationMessages(
     model: ConversationUserModel,
     items: List<ConversationModel>,
     modifier: Modifier,
-    scrollState: LazyListState
+    scrollState: LazyListState,
 ) {
     Box(modifier = modifier) {
-
         LazyColumn(
-            state = scrollState
+            state = scrollState,
         ) {
             items(items) { it ->
-                if (it.message.length % 2 != 0) MyMessage(conversationUserModel = model, it)
+                if (it.userName.isBlank()) MyMessage(conversationUserModel = model, it)
                 else Message(conversationUserModel = model, message = it)
             }
         }
@@ -264,7 +287,7 @@ private val ChatBubbleShapeMe = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
 fun PreviewLoginScreen() {
     MaterialTheme {
         val navController = rememberNavController()
-        ConversationScreen(navController = navController)
+        ConversationScreen(navController = navController, userId = "1")
     }
 }
 
