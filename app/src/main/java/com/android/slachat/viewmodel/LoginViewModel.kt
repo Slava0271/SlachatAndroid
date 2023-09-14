@@ -1,6 +1,5 @@
 package com.android.slachat.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -13,6 +12,9 @@ import com.android.slachat.mapper.Mapper
 import com.android.slachat.network.model.LoginEntity
 import com.android.slachat.presentation.SignInPresentation
 import com.android.slachat.usecase.LoginUseCase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -22,6 +24,9 @@ class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent,
     private val loginUseCase: LoginUseCase by inject()
     private val tokenProvider: ApiTokenProvider by inject()
     private val responseErrorsRepository: ResponseErrorsRepository by inject()
+
+    private val _errorEvent = MutableSharedFlow<String>()
+    val errorEvent: Flow<String> = _errorEvent
 
 
     override fun forgotPassword() {
@@ -40,9 +45,20 @@ class LoginViewModel : ViewModel(), SignInPresentation, KoinComponent,
                 navController.navigate("chatItems")
             }
             result.onFailure {
-                Log.d("showInfo","$it")
-                responseErrorsRepository.extractError(it)
+                emitError(it)
             }
+        }
+    }
+
+    private suspend fun emitError(error: Throwable) {
+        _errorEvent.emit(responseErrorsRepository.extractError(error))
+        delay(3000)
+        hideSnackBar()
+    }
+
+    fun hideSnackBar() {
+        viewModelScope.launch {
+            _errorEvent.emit(String())
         }
     }
 

@@ -2,8 +2,10 @@ package com.android.slachat.ui.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,14 +18,18 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -34,13 +40,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.android.slachat.R
 import com.android.slachat.data.SignInModel
-import com.android.slachat.presentation.SignInPresentation
 import com.android.slachat.ui.theme.EduSABeginnerFont
+import com.android.slachat.viewmodel.LoginViewModel
 import org.koin.androidx.compose.get
 
 val bodyMedium = TextStyle(
@@ -52,7 +59,7 @@ val bodyMedium = TextStyle(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
-    val signInPresentation = get<SignInPresentation>()
+    val signInPresentation = get<LoginViewModel>()
 
     val customTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = colorResource(id = R.color.silver),
@@ -68,33 +75,65 @@ fun LoginScreen(navController: NavController) {
     var passwordField by remember { mutableStateOf(TextFieldValue("Horosh_200271")) }
     var loginField by remember { mutableStateOf(TextFieldValue("Slavuha")) }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                start = dimensionResource(id = R.dimen.padding_view),
-                end = dimensionResource(id = R.dimen.padding_view),
-            ),
-        verticalArrangement = Arrangement.Center
     ) {
-        LoginContent(
-            customTextFieldColors = customTextFieldColors,
-            loginField = loginField,
-            onLoginFieldChange = { newValue -> loginField = newValue },
-            passwordField = passwordField,
-            onPasswordFieldChange = { newValue -> passwordField = newValue },
-            onLoginButtonClick = {
-                signInPresentation.signIn(
-                    SignInModel(loginField.text, passwordField.text),
-                    navController
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = dimensionResource(id = R.dimen.padding_view),
+                    end = dimensionResource(id = R.dimen.padding_view),
+                    top = dimensionResource(id = R.dimen.padding_view),
                 )
-            },
-            onForgotPasswordClick = {
+                .fillMaxHeight(), // Fill the height of the available space
+            verticalArrangement = Arrangement.Center
+        ) {
+            LoginContent(
+                customTextFieldColors = customTextFieldColors,
+                loginField = loginField,
+                onLoginFieldChange = { newValue -> loginField = newValue },
+                passwordField = passwordField,
+                onPasswordFieldChange = { newValue -> passwordField = newValue },
+                onLoginButtonClick = {
+                    signInPresentation.signIn(
+                        SignInModel(loginField.text, passwordField.text),
+                        navController
+                    )
+                },
+                onForgotPasswordClick = {
 
+                }
+            )
+        }
+
+        // Place the ErrorSnackBar at the bottom of the screen
+        ErrorSnackBar(signInPresentation, Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+@Composable
+fun ErrorSnackBar(viewModel: LoginViewModel, modifier: Modifier = Modifier) {
+    val errorState by viewModel.errorEvent.collectAsState(initial = "")
+
+    if (errorState.isNotEmpty()) {
+        Snackbar(
+            modifier = modifier.padding(10.dp),
+            content = {
+                Text(text = errorState)
+            },
+            action = {
+                TextButton(
+                    onClick = { viewModel.hideSnackBar() },
+                ) {
+                    Text(text = "Dismiss")
+                }
             }
         )
     }
 }
+
 
 @Composable
 fun LoginContent(
@@ -158,7 +197,7 @@ fun LoginField(
 @Composable
 fun PasswordField(
     customTextFieldColors: TextFieldColors,
-    passwordField: TextFieldValue =TextFieldValue("Horosh_200271"),
+    passwordField: TextFieldValue = TextFieldValue("Horosh_200271"),
     onPasswordFieldChange: (TextFieldValue) -> Unit
 ) {
     OutlinedTextField(
