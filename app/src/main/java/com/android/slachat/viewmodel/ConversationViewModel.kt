@@ -55,7 +55,7 @@ class ConversationViewModel : ViewModel(), KoinComponent, Mapper<MessageModel, C
 
 
     private suspend fun connectToServer() {
-        val host = "192.168.0.102"
+        val host = "192.168.0.100"
         val port = 8082
 
         try {

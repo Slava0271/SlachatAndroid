@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import com.android.slachat.mock.MockChatList
 import com.android.slachat.viewmodel.ChatListViewModel
 import org.koin.androidx.compose.get
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(navController: NavController) {
     val viewModel = get<ChatListViewModel>()
@@ -60,19 +62,21 @@ fun ChatScreen(navController: NavController) {
 
         Box(
             modifier = Modifier
-                .padding(25.dp)
+                .padding(end = 25.dp, bottom = 100.dp)
                 .fillMaxSize(),
             contentAlignment = Alignment.BottomEnd
         ) {
             FloatingActionButton(
                 onClick = {
-                    launcher.launch("image/*")
+
                 },
                 containerColor = colorResource(id = R.color.login_button)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
+
         }
+
     }
 }
 
@@ -85,7 +89,7 @@ fun ItemsList(navController: NavController, viewModel: ChatListViewModel) {
         ) {
             items(chatList) { chatItemModel ->
                 ChatItem(model = chatItemModel) { userId ->
-                    viewModel.onItemClick(navController,userId)
+                    viewModel.onItemClick(navController, userId)
                 }
             }
         }
@@ -120,7 +124,7 @@ fun CircleImage(image: String) {
 }
 
 @Composable
-fun ChatItem(model: ChatItemModel, handleClick: (userId : Int) -> Unit) {
+fun ChatItem(model: ChatItemModel, handleClick: (userId: Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
